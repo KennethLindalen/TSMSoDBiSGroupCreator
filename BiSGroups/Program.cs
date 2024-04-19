@@ -8,41 +8,63 @@ static class Program
     {
         Loons();
     }
-    
+
+
     public static void Loons()
     {
         var files = Directory.GetFiles(
             @"E:\Spill\World of Warcraft\_classic_era_\Interface\AddOns\LoonBestInSlot\Guides");
-        Dictionary<string, StreamWriter> phaseFiles = new Dictionary<string, StreamWriter>();
+        Dictionary<string, Dictionary<string, StreamWriter>> phaseFiles =
+            new Dictionary<string, Dictionary<string, StreamWriter>>();
+
         foreach (string file in files)
         {
             string[] lines = File.ReadAllLines(file);
+
             foreach (string line in lines)
             {
-                string itemStr = line.Replace("LBIS:AddItem(", "")
-                    .Replace(")", "")
-                    .Replace("\"", "");
+                string itemStr = line.Replace("LBIS:AddItem(", "").Replace(")", "").Replace("\"", "");
                 string[] itemArr = itemStr.Split(",");
 
-                if (itemArr.Length < 2 || itemArr[1].Contains("LBIS") || itemArr[0].Contains("LBIS"))
+                if (itemArr.Length < 4 || itemArr[1].Contains("LBIS") || itemArr[0].Contains("LBIS"))
                     continue;
 
                 itemArr[0] = itemArr[0].Replace("spec", "");
                 string phase = itemArr[0];
+                string type = itemArr[3].Split("--")[0].TrimEnd();
+                type = type.Replace("/", "-");
+                if (type.Contains("Mit") || type.Contains("Thrt") || type.Contains("Melee") ||
+                    type.Contains("Ranged") || type.Contains("Stam") || type.Contains("BIS-Alt"))
+                {
+                    type = type.Replace(" Mit", "");
+                    type = type.Replace(" Thrt", "");
+                    type = type.Replace(" Melee", "");
+                    type = type.Replace(" Ranged", "");
+                    type = type.Replace(" Stam", "");
+                    type = type.Replace(" BIS-Alt", " BIS");
+                }
                 
                 if (!phaseFiles.ContainsKey(phase))
                 {
-                    phaseFiles[phase] = File.AppendText($"C:\\TSM\\v3\\master-{phase}-{DateTime.Now.ToString("yyyy-MM-dd")}.txt");
+                    phaseFiles[phase] = new Dictionary<string, StreamWriter>();
                 }
-                phaseFiles[phase].Write($"{itemArr[1]},");
+                
+                if (!phaseFiles[phase].ContainsKey(type))
+                {
+                    phaseFiles[phase][type] = File.AppendText($"C:\\TSM\\v3\\phase-{phase}-{type.TrimStart()}.txt");
+                }
+                phaseFiles[phase][type].Write($"{itemArr[1]},");
             }
         }
         
-        foreach (var file in phaseFiles.Values)
+        foreach (var phaseDict in phaseFiles.Values)
         {
-            file.Close();
+            foreach (var file in phaseDict.Values)
+            {
+                file.Close();
+            }
         }
-        
+
         var processedFiles = Directory.GetFiles(@"C:\TSM\v3");
         foreach (string file in processedFiles)
         {
