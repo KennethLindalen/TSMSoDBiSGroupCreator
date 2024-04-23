@@ -33,16 +33,16 @@ static class Program
                 string phase = itemArr[0];
                 string type = itemArr[3].Split("--")[0].TrimEnd();
                 type = type.Replace("/", "-");
-                if (type.Contains("Mit") || type.Contains("Thrt") || type.Contains("Melee") ||
-                    type.Contains("Ranged") || type.Contains("Stam") || type.Contains("BIS-Alt"))
-                {
-                    type = type.Replace(" Mit", "");
-                    type = type.Replace(" Thrt", "");
-                    type = type.Replace(" Melee", "");
-                    type = type.Replace(" Ranged", "");
-                    type = type.Replace(" Stam", "");
-                    type = type.Replace(" BIS-Alt", " BIS");
-                }
+                type = Regex.Replace(type, @"\s*(Mit|Thrt|Melee|Ranged|Stam|BIS-Alt)\s*", m => m.Groups[1].Value switch
+{
+    "Mit" => "",
+    "Thrt" => "",
+    "Melee" => "",
+    "Ranged" => "",
+    "Stam" => "",
+    "BIS-Alt" => " BIS",
+    _ => m.Value
+});
                 
                 if (!phaseFiles.ContainsKey(phase))
                 {
