@@ -77,7 +77,10 @@ static class Program
         foreach (string file in processedFiles)
         {
             string fileContent = File.ReadAllText(file);
-            string cleanedFileContent = Regex.Replace(fileContent, @"[^a-zA-Z0-9,:]", "");
+            string cleanedFileContent = Regex.Replace(fileContent, @"[^a-zA-Z0-9,:]", "").TrimStart();
+            if (cleanedFileContent.EndsWith(","))
+                cleanedFileContent = cleanedFileContent.Remove(cleanedFileContent.Length - 1);
+            
             File.WriteAllText(file, cleanedFileContent);
         }
     }
