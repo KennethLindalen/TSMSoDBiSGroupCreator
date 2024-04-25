@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace BiSGroups;
@@ -24,21 +25,21 @@ static class Program
         foreach (string file in files)
         {
             string[] lines = File.ReadAllLines(file);
-
+        
             foreach (string line in lines)
             {
                 string itemStr = line.Replace("LBIS:AddItem(", "").Replace(")", "").Replace("\"", "");
                 string[] itemArr = itemStr.Split(",");
-
+        
                 if (itemArr.Length < 4 || itemArr[1].Contains("LBIS") || itemArr[0].Contains("LBIS"))
                     continue;
-
+        
                 // Comment out the next line to get all items if you don't care if BoP or BoE
                 // This makes the process take a lot longer
                 if (await GetBoPStatus(itemArr[1]))
                     continue;
-
-
+        
+        
                 itemArr[0] = itemArr[0].Replace("spec", "");
                 string phase = itemArr[0];
                 string type = itemArr[3].Split("--")[0].TrimEnd();
@@ -50,21 +51,21 @@ static class Program
                         .Replace(" Melee", "").Replace(" Ranged", "")
                         .Replace(" Stam", "").Replace(" BIS-Alt", " BIS");
                 }
-
+        
                 if (!phaseFiles.ContainsKey(phase))
                 {
                     phaseFiles[phase] = new Dictionary<string, StreamWriter>();
                 }
-
+        
                 if (!phaseFiles[phase].ContainsKey(type))
                 {
                     phaseFiles[phase][type] =
                         File.AppendText($"C:\\TSM\\v3\\phase-{phase}-{type.TrimStart()}-{(_isBoP ? "NoBoP" : "WithBoP")}.txt");
                 }
-                phaseFiles[phase][type].Write($"{itemArr[1]},");
+                phaseFiles[phase][type].Write($"{itemArr[1].Replace(" ", "")},");
             }
         }
-
+        
         foreach (var phaseDict in phaseFiles.Values)
         {
             foreach (var file in phaseDict.Values)
@@ -76,8 +77,10 @@ static class Program
         var processedFiles = Directory.GetFiles(@"C:\TSM\v3");
         foreach (string file in processedFiles)
         {
+            if(file.Contains("data.db") || file.Contains("gecko"))
+                continue;
             string fileContent = File.ReadAllText(file);
-            string cleanedFileContent = Regex.Replace(fileContent, @"[^a-zA-Z0-9,:]", "").TrimStart();
+            string cleanedFileContent = Regex.Replace(fileContent, @"[^a-zA-Z0-9,:]", "");
             if (cleanedFileContent.EndsWith(","))
                 cleanedFileContent = cleanedFileContent.Remove(cleanedFileContent.Length - 1);
             

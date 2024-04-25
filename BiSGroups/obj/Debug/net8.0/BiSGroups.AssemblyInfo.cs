@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BiSGroups")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ce99894cac0bc274366fd6a2274d180a5337f404")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef2e5272d94908562b24a75995038ded4261791f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BiSGroups")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BiSGroups")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
